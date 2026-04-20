@@ -15,6 +15,10 @@ This project currently supports:
 - viewing team rosters within the same league
 - assigning roster slots with league-wide uniqueness rules
 - clearing roster slots
+- snake and manual league modes
+- randomized snake draft start
+- draft board with available and taken assets
+- draft pick history
 - seeded LCK organizations and players for local testing
 
 ## Tech Stack
@@ -57,6 +61,9 @@ lck-fantasy-backend/
 |   |-- lib/
 |   |-- middleware/
 |   `-- routes/
+|       |-- league-base.js
+|       |-- league-draft.js
+|       `-- leagues.js
 |-- package.json
 |-- prisma.config.ts
 `-- README.md
@@ -156,6 +163,10 @@ Leagues:
 - `GET /leagues/by-code/:inviteCode`
 - `POST /leagues`
 - `POST /leagues/join`
+- `POST /leagues/:leagueId/draft/start`
+- `GET /leagues/:leagueId/draft`
+- `GET /leagues/:leagueId/draft/board`
+- `POST /leagues/:leagueId/draft/pick`
 
 Teams:
 
@@ -170,6 +181,7 @@ Teams:
 4. Call `GET /leagues/mine` to get the user's leagues and team ids.
 5. Call `GET /teams/:teamId/roster` to view the slot-based roster shape.
 6. Call `PATCH /teams/:teamId/roster` to assign or clear slots.
+7. For snake leagues, start the draft and use the draft board/pick routes.
 
 ## Roster Updates
 
@@ -221,6 +233,58 @@ Rules currently enforced:
 - player role must match the slot
 - a player can only appear on one fantasy team per league
 - a defense organization can only appear on one fantasy team per league
+
+## Draft Flow
+
+League modes:
+
+- `snake`
+- `manual`
+
+Snake draft supports:
+
+- randomized draft order
+- snake turn order across rounds
+- auto-slotting by player role or defense organization
+- draft board visibility for league members
+- pick history
+
+Draft examples:
+
+Start a draft:
+
+```text
+POST /leagues/:leagueId/draft/start
+```
+
+Fetch draft state:
+
+```text
+GET /leagues/:leagueId/draft
+```
+
+Fetch draft board:
+
+```text
+GET /leagues/:leagueId/draft/board
+GET /leagues/:leagueId/draft/board?role=mid
+```
+
+Make a player pick:
+
+```json
+{
+  "playerId": "player_cuid_here"
+}
+```
+
+Make a defense pick:
+
+```json
+{
+  "organizationId": "org_cuid_here"
+}
+```
 
 ## Current Seed Data
 
